@@ -18,3 +18,15 @@ main = print $ (euclid 36 15)
 --ghc --make -XQuasiQuotes main.hs -o main
 
 
+
+module Main (main) where
+
+import Lib
+
+main :: IO ()
+main = someFunc
+
+
+
+
+

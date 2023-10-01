@@ -1,317 +1,158 @@
-
-
-
-module MIMA
-    ( someFunc,euclid
+module Lib
+    ( someFunc
     ) where
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
+--
+import Data.Complex (Complex, realPart)
 
-euclid::Integer->Integer->Integer
-euclid n p
-  | n < 0            = 0
-  | n `mod` 17 == 2  = -15
-  | otherwise        = n + p
+type CD = Complex Double
 
---rest = print $ (euclid 2 3)
-
-
-
-
-
---main :: IO ()
---main = putStrLn "Test suite not yet implemented"
-
-
--- https://serokell.io/blog/introduction-to-template-haskell
-
--- http://wiki.haskell.org/Template_Haskell
-
--- https://downloads.haskell.org/~ghc/7.0.2/docs/html/users_guide/template-haskell.html
-
-
--- https://srid.ca/haskell-template
-
--- https://www.parsonsmatt.org/2021/07/12/template_haskell_performance_tips.html
-
-
--- https://www.tweag.io/blog/2021-01-07-haskell-dark-arts-part-i/
-
--- https://github.com/PHPirates/haskell-template-project/blob/master/Setup.hs
-
-
--- https://www.joachim-breitner.de/blog/772-Template_Haskell_recompilation
-
- 
--- https://downloads.haskell.org/~ghc/6.0/docs/html/users_guide/template-haskell.html
-
-
-
-
-
-{-We gooien met drie dobbelstenen. Schrijf een functie die een lijst teruggeeft
-met alle mogelijke worpen. Voor het representeren van een worp gebruiken we
-tuples, bijv. (1; 2; 3). Schrijf de functie zodanig dat alleen de worpen, waarvan
-de som van de ogen een veelvoud is van vijf in de lijst worden opgenomen. Hoe
-groot is het aantal worpen?
-
-Herschrijf de functie uit opdracht 2c zodanig dat de lijst van tuples een veelvoud
-is van n.-}
-
-
-
-import Data.List.Split
-import Data.Char
-import Control.Monad
-import Control.Monad.Random
-import System.Environment
-
-
-type Dice = (Int, Int)
-
-diceCode :: String -> Dice
-diceCode die = (parts!!0, parts!!1)
+quadraticRoots :: (CD, CD, CD) -> (CD, CD)
+quadraticRoots (a, b, c)
+  | 0 < realPart b =
+    ( (2 * c) / (- b - d),
+      (- b - d) / (2 * a)
+    )
+  | otherwise =
+    ( (- b + d) / (2 * a),
+      (2 * c) / (- b + d)
+    )
   where
-    parts = [read x :: Int | x <- take 2 (splitOn "D" (map toUpper die))]
+    d = sqrt $ b ^ 2 - 4 * a * c
 
-
-rollDie :: (RandomGen g) => Int -> Rand g Int
-rollDie sides = getRandomR (1, sides)
-
-rollDice :: (RandomGen g) => Dice -> Rand g Int
-rollDice dice = liftM sum (sequence(replicate rolls (rollDie sides)))
-  where
-    rolls = fst dice
-    sides = snd dice
-
-
-main = do
-  args <- getArgs
-  roll <- evalRandIO (rollDice (diceCode (args!!0)))
-  putStrLn ("You rolled: " ++ show roll)
-
-
- -- https://codereview.stackexchange.com/questions/114725/my-first-haskell-dice-rolling
-
- module Main where
-
- import System.IO
- import System.Random
- import Data.List
-
- diceColor = [("Black",1),("Green",2),("Purple",3),("Red",4),("White",5),("Yellow",6)]
-
- {-
- randomList :: (RandomGen g) -> Int -> g -> [Integer]
- random 0 _ = []
- randomList n generator = r : randomList (n-1) newGenerator
-         where (r, newGenerator) = randomR (1, 6) generator
- -}
-
- rand :: Int -> [Int] -> IO ()
- rand n rlst = do
-     num <- randomRIO (1::Int, 6)
-     if n == 0
-         then doSomething rlst
-         else rand (n-1) (num:rlst)
-
- doSomething x = putStrLn (show (sort x))
-
- main :: IO ()
- main = do
-     --hSetBuffering stdin LineBuffering
-     putStrLn "roll, keep, score?"
-     cmd <- getLine
-     doYahtzee cmd
-     --rand (read cmd) []
-
- doYahtzee :: String -> IO ()
- doYahtzee cmd = do
- if cmd == "roll"
-     then rand 5 []
-         else do print "You won"
- -- https://stackoverflow.com/questions/9578017/dice-game-in-haskell
-{-# LANGUAGE RecordWildCards #-}
-
-module Main
-  ( main
-  ) where
-
-import Control.Monad.Random
-import Options.Applicative
-
-import Control.Monad (forM_, replicateM)
-import Data.Semigroup ((<>))
-import System.Environment (getArgs)
-
-data Args = Args
-  { n :: Int
-  , m :: Int
-  , times :: Int
-  }
-
-instance Show Args where
-  show Args{..} = unwords $
-    [ "Rolling"
-    , show n ++ "d" ++ show m
-    , show times
-    , "time(s)"
+main :: IO ()
+main =
+  mapM_
+    (print . quadraticRoots)
+    [ (3, 4, 4 / 3),
+      (3, 2, -1),
+      (3, 2, 1),
+      (1, -10e5, 1),
+      (1, -10e9, 1)
     ]
 
-diceArgs :: Parser Args
-diceArgs = Args
-  <$> argument auto (metavar "N" <> value 1)
-  <*> argument auto (metavar "M" <> value 6)
-  <*> argument auto (metavar "TIMES" <> value 1)
+-- https://rosettacode.org/wiki/Roots_of_a_quadratic_function#Haskell
 
-opts :: ParserInfo Args
-opts = info (diceArgs <**> helper)
-  (  fullDesc
-  <> progDesc "Roll NdM dice TIMES times"
-  <> header "dice"
-  )
+-- ax^2 + bx + c = 0
 
-tossDice :: MonadRandom m => Int -> Int -> m [Int]
-tossDice n m = replicateM n $ getRandomR (1, m)
+qEquation :: (Float, Float, Float) -> (Float, Float)
+qEquation (a, b, c) = (x1, x2)
+		where
+			x1 = e + sqrt d / (2 * a)
+			x2 = e - sqrt d / (2 * a)
+			d = b * b - 4 * a * c
+			e = - b / (2 * a)
 
-tossDiceMultiple :: MonadRandom m => Args -> m [[Int]]
-tossDiceMultiple Args{..} = replicateM times $ tossDice n m
 
-main :: IO ()
+
+
+
+-- https://gist.github.com/rbtbr/243360
+
+
+
+
+
+-- function declaration for function printRoots
+printRoots :: Float->Float->Float->IO()
+
+-- function definition for function printRoots
+printRoots a b c = do
+   print("a,b,c values =",a,b,c)
+   let d = b^2 - 4*a*c
+   -- let d = 1
+   if (d < 0)
+      then do
+         print ("This quadratic equation has imaginary roots")
+      else do
+         let root1 = (-(b) + sqrt (d))/2 * (a)
+         let root2 = (-(b) - sqrt (d))/2 * (a)
+         print ("The roots for this quadratic are:")
+         print (root1)
+         print (root2)
+
+main :: IO()
 main = do
-  args <- execParser opts
-  putStrLn $ show args
-  g <- newStdGen
-  let rs = evalRand (tossDiceMultiple args) g
-  forM_ rs $ \r ->
-    putStrLn $ "Result: " ++ show (sum r) ++ "\tDice: " ++ show r
+-- declaring and initializing constants in quadratic equation
+   let a = 1
+   let b = 4
+   let c = 2
+-- invoking the printRoots function
+   printRoots (a) (b) (c)
 
- -- https://github.com/biesnecker/haskell-dice/blob/master/dice.hs
-
-
-
- -- http://sleepomeno.github.io/blog/2017/04/02/Generating-random-Enum-values/
-module Main where
-
-import System.IO
-import System.Random
-import Data.List
-
-diceColor = [("Black",1),("Green",2),("Purple",3),("Red",4),("White",5),("Yellow",6)]
-diceRoll = []
-
-rand :: Int -> [Int] -> IO ()
-rand n rlst = do
-       num <- randomRIO (1::Int, 6)
-       if n == 0
-        then printList rlst       -- here is where I need to do something to store the values
-        else rand (n-1) (num:rlst)
-
-printList x = putStrLn (show (sort x))
-
---matchColor x = doSomething()
-
-main :: IO ()
-main = do
-    --hSetBuffering stdin LineBuffering
-    putStrLn "roll, keep, score?"
-    cmd <- getLine
-    doYahtzee cmd
-    --rand (read cmd) []
-
-doYahtzee :: String -> IO ()
-doYahtzee cmd = do
-if cmd == "roll"
-    then do rand 5 []
-        else putStrLn "Whatever"
-
- -- https://stackoverflow.com/questions/9581521/storing-values-in-a-data-structure-haskell
-import Data.List.Split
-import Data.Char
-import Control.Monad
-import Control.Monad.Random
-import System.Environment
+-- https://www.tutorialspoint.com/haskell-program-to-find-all-roots-of-a-quadratic-equation
 
 
-type Dice = (Int, Int)
 
-diceCode :: String -> Dice
-diceCode die = (parts!!0, parts!!1)
-  where
-    parts = [read x :: Int | x <- take 2 (splitOn "D" (map toUpper die))]
+functionRoot a b c = if d < 0 then error "0" else (x, y)
+                        where
+                          x = e + sqrt d / (2 * a)
+                          y = e - sqrt d / (2 * a)
+                          d = b * b - 4 * a * c
+                          e = - b / (2 * a)
+
+-- https://stackoverflow.com/questions/7794692/haskell-quadratic-equation-root
 
 
-rollDie :: (RandomGen g) => Int -> Rand g Int
-rollDie sides = getRandomR (1, sides)
 
-rollDice :: (RandomGen g) => Dice -> Rand g Int
-rollDice dice = liftM sum (sequence(replicate rolls (rollDie sides)))
-  where
-    rolls = fst dice
-    sides = snd dice
+-- MathPrimer
 
+delta :: Floating a => a -> a -> a -> a
+x1 :: Floating a => a -> a -> a -> a
+x2 :: Floating a => a -> a -> a -> a
+
+delta a b c = b * b - 4 * a * c
+
+x1 a b c = ( - b - sqrt(delta a b c)) / ( 4 * a * c )
+x2 a b c = ( - b + sqrt(delta a b c)) / ( 4 * a * c )
+
+
+class Algebraic equ where
+    algebraicForm :: equ -> String
+
+class (ZeroEquation equ) where
+    solve :: equ -> [Float]
+    solutionCount :: equ -> Int
+
+
+data Equation = Quadratic {a :: Float, b :: Float, c :: Float}
+    deriving (Show, Read, Eq)
+
+instance (ZeroEquation Equation) where
+    solve (Quadratic a b c) = solutions
+        where
+            both = [x1 a b c, x2 a b c]
+            one = [x1 a b c]
+            zero = []
+            solutions = if _delta < 0 then zero else if _delta == 0 then one else both
+            _delta = (delta a b c)
+    solutionCount (Quadratic a b c) = count
+        where
+            count = if _delta < 0 then 0 else if _delta == 0 then 1 else 2
+            _delta = (delta a b c)
+
+instance (Algebraic Equation) where
+    algebraicForm (Quadratic a b c) = show a ++ "x^2 +" ++ show b ++ "x +" ++ show c
+
+showEquation :: Equation -> String
+showEquation equ = "Equation " ++ description ++ " = 0 has following " ++ count ++ " solutions:\n" ++ solutions
+    where
+        count = show $ solutionCount equ
+        description = algebraicForm equ
+        solutions = unlines $ map show $ solve equ
 
 main = do
-  args <- getArgs
-  roll <- evalRandIO (rollDice (diceCode (args!!0)))
-  putStrLn ("You rolled: " ++ show roll)
+    let equation = Quadratic (-10) 4 1
+    putStrLn $ showEquation equation
+
+
+-- https://codereview.stackexchange.com/questions/254618/haskell-basic-typeclass-primer-quadratic-equations
 
 
 
- -- https://codereview.stackexchange.com/questions/114725/my-first-haskell-dice-rolling
-
-import Control.Monad (replicateM)
-import Data.List (group, sort)
-
-succeeds :: (Int, Int) -> (Int, Int) -> Double
-succeeds p1 p2 =
-  sum
-    [ realToFrac (c1 * c2) / totalOutcomes
-    | (s1, c1) <- countSums p1
-    , (s2, c2) <- countSums p2
-    , s1 > s2 ]
-  where
-    totalOutcomes = realToFrac $ uncurry (^) p1 * uncurry (^) p2
-    countSums (nFaces, nDice) = f [1 .. nFaces]
-      where
-        f =
-          fmap (((,) . head) <*> (pred . length)) .
-          group . sort . fmap sum . replicateM nDice
-
-main :: IO ()
-main = do
-  print $ (4, 9) `succeeds` (6, 6)
-  print $ (10, 5) `succeeds` (7, 6)
-
-
-
--- https://rosettacode.org/wiki/Dice_game_probabilities
-
-
-import Data.Char
-import Control.Monad
-import System.Environment
-
-
-
-bar :: Num a => [a] -> [a]
-bar xs = foldr (\ x r f g -> f x (r g f)) 
-               (\ _ _ -> []) 
-               xs 
-               (:)
-               ((:) . (*2))
-
-
-
-main :: IO ()
-main = do
-putStrLn ("You rolled: ")
-print(bar [1..9])
-
- --
- 
- {-
+{-
 Opdracht 2d
 Schrijf de functie:
 integreer::(Double->Double)->Double->Double->Double->Double
