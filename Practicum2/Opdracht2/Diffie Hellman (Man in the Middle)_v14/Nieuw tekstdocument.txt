@@ -1,0 +1,231 @@
+
+
+ghci> import Crypto.Hash
+ghci> hash ("hello world"::ByteString) :: Digest SHA1
+2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+ghci> hash ("hello world"::ByteString) :: Digest MD5
+5eb63bbbe01eeed093cb22bb8f5acdc3
+ghci> hash ("hello world"::ByteString) :: Digest SHA256
+b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+ghci> hash ("hello world"::ByteString) :: Digest SHA3_256
+644bcc7e564373040999aac89e7622f3ca71fba1d972fd94a31c3bfbf24e3938
+ghci> hash ("hello world"::ByteString) :: Digest Blake2s_256
+9aec6806794561107e594b1f6a8a6b0c92a0cba9acf5e5e93cca06f781813b0b
+ghci> hash ("hello world"::ByteString) :: Digest Blake2b_256
+256c83b297114d201b30179f3f0ef0cace9783622da5974326b436178aeef610
+
+ghci> import Crypto.MAC.HMAC
+ghci> import Crypto.Hash
+ghci> hmacGetDigest $ hmac ("secret key"::ByteString) ("hello world"::ByteString) :: Digest SHA256
+c61b5198df58639edb9892514756b89a36856d826e5d85023ab181b48ea5d018
+ghci> hmacGetDigest $ hmac ("secret key"::ByteString) ("hello world"::ByteString) :: Digest Blake2b_256
+198e317eba56eee5056b88f527c895d6235ace9153fdf6467e38c2758073328c
+
+
+ghci> import Crypto.KDF.PBKDF2
+ghci> generate (prfHMAC SHA256 :: PRF ByteString) (Parameters {iterCounts = 1000, outputLength = 32}) ("password":: ByteString) ("salt"::ByteString) :: ByteString
+"c,(\DC2\228mF\EOT\DLE+\167a\142\157m}/\129(\246&kJ\ETX&M*\EOT`\183\220\179"
+
+
+ghci> convertToBase Base16 $ (generate (prfHMAC SHA256 :: PRF ByteString) (Parameters {iterCounts = 1000, outputLength = 32}) ("password":: ByteString) ("salt"::ByteString) :: ByteString) :: ByteString
+"632c2812e46d4604102ba7618e9d6d7d2f8128f6266b4a03264d2a0460b7dcb3"
+
+
+ghci> import Crypto.KDF.Scrypt
+ghci> generate (Parameters {n=1024,r=8,p=2,outputLength=32}) ("password":: ByteString) ("salt"::ByteString) ::ByteString
+"\ETBeHl\244\197Y\DEL\181\&0\141\SYN\185\151\148\215\211\160\189.\148d\185\172\177\202\&2\ETX\SUB\133\223\237"
+
+
+ghci> import Crypto.KDF.HKDF
+ghci> import Crypto.Hash (SHA256)
+ghci> let pkr = extract ("salt" :: ByteString) ("secret" :: ByteString) :: PRK SHA256
+ghci| in expand pkr ("payload" :: ByteString) 32 :: ByteString
+"\DC4\147\223\v%\175\f\177\143\132\202\142\233\236\135\153\253\CANs\213wh\149\193\128\240\192t\DC1\UST,"
+
+ghci> import Crypto.Random
+ghci> import Crypto.Cipher.Types
+ghci> import Crypto.Cipher.AES (AES256)
+ghci> import Crypto.Error
+ghci> do
+ghci| cipher <- (getRandomBytes 32 :: IO ByteString) >>= (throwCryptoErrorIO . cipherInit) :: IO AES256
+ghci| return $ ctrCombine cipher nullIV ("message"::ByteString)
+ghci| 
+"\208\207\SI\191\206\DELN"
+
+
+
+ghci> import Crypto.Cipher.AESGCMSIV
+ghci> do
+ghci| key :: ByteString <- getRandomBytes 32
+ghci| nonce <- generateNonce
+ghci| throwCryptoErrorIO $ do
+ghci| aes :: AES256 <- cipherInit key
+ghci| return $ encrypt aes nonce ("context" :: ByteString) ("message" :: ByteString) 
+ghci| 
+(AuthTag {unAuthTag = "\239|\229V\USNT3\ACKf\NAK\STXC\251\134\FS"},"\149\229\142SW\209Z")
+
+
+ghci> import Crypto.Error
+ghci> import Crypto.Cipher.ChaChaPoly1305
+ghci| do
+ghci| key <- getRandomBytes 32 :: IO ByteString
+ghci| nonce <- getRandomBytes 12 :: IO ByteString
+ghci| throwCryptoErrorIO $ do
+ghci| st1 <- nonce12 nonce >>= initialize key
+ghci| let
+ghci|   st2 = finalizeAAD $ appendAAD ("context":: ByteString) st1
+ghci|   (out, st3) = encrypt ("message":: ByteString) st2
+ghci|   auth = finalize st3
+ghci| return $ (convertToBase Base16 out :: ByteString, convertToBase Base16 auth :: ByteString)
+("f0dd593fb3cac0","4a29dd7ae8b51ac748b37092ed485e88")
+
+
+
+
+ghci> import Crypto.PubKey.ECC.DH
+ghci> import Crypto.PubKey.ECC.Types
+ghci> let curve = getCurveByName SEC_p384r1
+ghci> do
+ghci| alicePrivateKey <- generatePrivate curve
+ghci| let alicePublicKey = calculatePublic curve alicePrivateKey
+ghci| bobPrivateKey <- generatePrivate curve
+ghci| let bobPublicKey = calculatePublic curve bobPrivateKey
+ghci| let aliceSharedKey = getShared curve alicePrivateKey bobPublicKey
+ghci| let bobSharedKey = getShared curve bobPrivateKey alicePublicKey
+ghci| return (aliceSharedKey == bobSharedKey)
+ghci| 
+True
+
+
+
+do
+alicePrivateKey <- generateSecretKey
+let alicePublicKey = toPublic alicePrivateKey
+bobPrivateKey <- generateSecretKey
+let bobPublicKey = toPublic bobPrivateKey
+let aliceSharedKey = dh bobPublicKey alicePrivateKey
+let bobSharedKey = dh alicePublicKey bobPrivateKey
+return (aliceSharedKey == bobSharedKey)
+
+
+
+
+ghci> import Crypto.PubKey.ECC.ECDSA
+ghci> import Crypto.PubKey.ECC.Generate
+ghci> import Crypto.Hash.Algorithms
+ghci> do
+ghci| (alicePublicKey, alicePrivateKey) <- generate curve
+ghci| toBob <- sign alicePrivateKey SHA256 ("message to Bob"::ByteString)
+ghci| return $ verify SHA256 alicePublicKey toBob ("message to Bob"::ByteString)
+ghci| 
+True
+
+
+
+
+ghci> import Crypto.PubKey.RSA
+ghci> import Crypto.PubKey.RSA.PKCS15
+ghci> import Crypto.Hash.Algorithms
+ghci> (publicKey, privateKey) <- generate 256 65537
+ghci> sign Nothing (Just SHA256) privateKey ("to Bob"::ByteString)
+Right "=\161\243j\STX]\251g=\234\GSx>\159\248\128#\DEL\235\188\240\221U\232{\176\DLE\231\210\229z2\SI\212\212\216\235\239bO\205&t\248\SOH\249K.\191R\169\175#\183\f\239\141\142\201\144\&0\174[\ESC\228T`\136\239\221\EOT\214\235\&8\NAK\255\245l\148\228?\FS\254N'pO\221\"n'\249<\242\RS\146\DELl\210\157~[\254)\SYN@\249\232\ENQs\RSl\177u\213\207\239\129\159\ETX&\141\DC13\243\250\232\187\222\DLEF\207\222\231\EM\186M\245Hv\238\n\ACK\SOw\254\196\173&\209N\245\217\&4m\234\161l\158\173\225;\SYN\187\217\v\r\199\b\193\v\167{Dk\234\194\174\133\150@\148\DEL\190\193\141\DC1\140S\141\GS\135\n\161)\253\179\241\199\230k<G\135\158\225\DC2?h\211\240#;\183\192\182\168eS\\\195V\135mZ\rA\173\197\139\193\135\174\233\138&r\SIK\197\156\r\a\DELV\ETX\218\FS\188d\NAKw\222\252\ESC\SO"
+
+
+
+
+
+
+
+
+--https://blog.oyanglul.us/devops/cryptography
+
+
+
+
+
+
+
+--https://www.stephendiehl.com/posts/haskell_2017.html
+
+
+
+
+
+
+--https://www.fpcomplete.com/blog/cryptographic-hashing-haskell/
+
+
+
+--https://hackage.haskell.org/package/cpsa-2.2.7/src/doc/cpsasdha.pdf
+
+
+
+
+
+
+
+
+{-
+https://github.com/jaybosamiya/DiffieHellman-ManInTheMiddle/blob/master/diffie_hellman.py
+https://wiremask.eu/articles/diffie-hellman-man-in-the-middle-attack/
+https://eprints.illc.uva.nl/id/eprint/934/1/MoL-2014-16.text.pdf
+
+
+
+Man-in-the-middle attack Java code
+https://asecuritysite.com/keyexchange/diffie_crack
+https://guides.codepath.com/websecurity/Man-in-the-Middle
+https://att-innovate.github.io/squanch/demos/man-in-the-middle.html
+https://www.varonis.com/blog/man-in-the-middle-attack
+https://www.chegg.com/homework-help/questions-and-answers/simulate-man-middle-attack-diffie-hellman-python-completing-existing-code-ross-trying-inte-q90983650
+https://medium.com/asecuritysite-when-bob-met-alice/well-done-to-whatsapp-in-taking-security-seriously-key-transparency-2d56bce47396
+https://codeberg.org/severin/vula/src/branch/main/podman/Vula-MitM-tool.md
+https://www.rapid7.com/fundamentals/man-in-the-middle-attacks/
+https://www.esat.kuleuven.be/cosic/publications/article-2698.pdf
+https://www.dschoni.de/security/54/
+https://www.linkedin.com/pulse/meet-first-couple-cryptography-alice-bob-mike-makwani
+https://crysp.uwaterloo.ca/courses/cs458/F08-lectures/Module5.pdf
+https://intronetworks.cs.luc.edu/current/html/publickey.html
+https://www.comparitech.com/vpn/what-is-a-man-in-the-middle-attack/
+https://textbook.cs161.org/crypto/certificates.html
+http://www2.ic.uff.br/~michael/kr1999/7-security/7_03-authentication.htm
+https://www.net.in.tum.de/pub/netsec2016/10_cryptoprot.pdf
+https://www.synopsys.com/blogs/software-security/man-in-the-middle-mitm-attack.html
+https://www.cs.du.edu/~ramki/courses/security/forensics/notes/NetworkSecurity.pdf
+https://github.com/kientuong114/docker-mitm
+http://www.cs.toronto.edu/~ahchinaei/teaching/2016jan/csc358/Lecture12-6p.pdf
+https://people.cs.rutgers.edu/~pxk/419/notes/pdf/08-auth-slides.pdf
+
+
+Diffie-Hellman (Man-in-the-middle) haskell
+https://inria.hal.science/hal-01948964/document
+https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=man
+https://chaum.com/wp-content/uploads/2022/01/MitMCryptologia.pdf
+https://www.academia.edu/70628631/The_State_of_the_art_Cryptographic_Algorithms
+https://dl.acm.org/profile/81100070918/publications?Role=author
+https://pure.tue.nl/ws/files/2425555/200612074.pdf
+https://www.diva-portal.org/smash/get/diva2:1566787/FULLTEXT01.pdf
+https://www.ndss-symposium.org/wp-content/uploads/2017/09/ndss2017_04A-3_Donenfeld_paper.pdf
+https://www.mdpi.com/2410-387X/2/4
+https://www.il-pib.pl/czasopisma/JTIT/2021/2/107.pdf
+https://discovery.dundee.ac.uk/ws/portalfiles/portal/39889676/paper.pdf
+http://www.illusorytls.com/docs/illusoryTLS_zeronights2015_ndd.pdf
+https://researchmgt.monash.edu/ws/portalfiles/portal/348644028/342377358_oa.pdf
+https://members.loria.fr/CDumenil/files/RapportDeStage.pdf
+https://www.research-collection.ethz.ch/bitstream/handle/20.500.11850/569146/1/Wiesner_Sven.pdf
+https://diglib.tugraz.at/download.php?id=60a4eadb05681&location=browse
+https://www.usenix.org/system/files/conference/usenixsecurity15/sec15-paper-kaloper-mersinjak.pdf
+https://isyou.info/jowua/papers/jowua-v8n1-3.pdf
+https://computerscience.paris/security/pdf/readings/WireGuard%20Next%20Generation%20Network%20Tunnel.pdf
+https://archive.conference.hitb.org/hitbsecconf2015ams/wp-content/uploads/2014/12/WHITEPAPER-The-illusoryTLS-Asymmetric-Backdoor.pdf
+https://sar.informatik.hu-berlin.de/research/publications/SAR-PR-2020-01/SAR-PR-2020-01_.pdf
+https://blog.srinivasan.biz/software/security/crypto-strength-pre-and-post-quantum
+https://crypto.stackexchange.com/questions/72370/diffie-hellman-algorithm-and-mitm-attack
+https://github.com/topics/diffie-hellman-algorithm?o=desc&s=updated
+https://hackage.haskell.org/package/cpsa-2.2.6/changelog
+https://www.researchgate.net/publication/4023175_The_Diffie-Hellman_key-agreement_scheme_in_the_strand-space_model
+https://unhandledexpression.com/page5/
+
+-}
+
+

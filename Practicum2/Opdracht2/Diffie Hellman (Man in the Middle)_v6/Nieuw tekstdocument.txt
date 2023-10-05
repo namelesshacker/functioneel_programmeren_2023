@@ -1,0 +1,15 @@
+
+gcd x y =  gcd' (abs x) (abs y)
+	where
+	gcd' a 0  =  a
+	gcd' a b  =  gcd' b (a `rem` b)
+
+
+
+
+gcd a b
+    |   a==b =a
+    |   a>b = gcd5(a-b) b
+    |   otherwise = gcd5 a (b-a)
+
+-- https://programming-idioms.org/idiom/74/compute-gcd/947/haskell

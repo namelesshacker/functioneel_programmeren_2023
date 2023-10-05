@@ -1,0 +1,43 @@
+
+
+{-
+
+totient
+  :: (Integral a)
+  => a -> a
+totient n
+  | n == 0 = 1 -- by definition phi(0) = 1
+  | n < 0 = totient (-n) -- phi(-n) is taken to be equal to phi(n)
+  | otherwise = loop n n 2 --
+  where
+    loop !m !tot !i
+      | i * i > m = bool tot (tot - (tot `div` m)) (1 < m)
+      | m `mod` i == 0 = loop m_ tot_ i_
+      | otherwise = loop m tot i_
+      where
+        i_
+          | i == 2 = 3
+          | otherwise = 2 + i
+        m_ = nextM m
+        tot_ = tot - (tot `div` i)
+        nextM !x
+          | x `mod` i == 0 = nextM $ x `div` i
+          | otherwise = x
+-}
+
+
+
+
+
+-- Problem 31: Determine whether a given integer number is prime.
+-- Armed with our experience from Project Euler, this is not very daunting.
+-- We make sure n is not divided by any "candidates" up to sqrt(n). Which candidates?
+-- Well, the prime numbers, of course! Well, we're not gonna spend time tracking out the
+-- prime numbers in a primality test, though - we're going to use the P6 candidates;
+-- numbers of the form 6*n±1 :
+isprime :: (Integral a) => a -> Bool
+isprime n | n < 4 = n > 1
+isprime n = all ((/=0) . mod n) $ takeWhile (<=m) candidates
+    where candidates = (2:3:[x + i | x <- [6,12..], i <- [-1, 1]])
+          m = floor . sqrt $ fromIntegral n
+

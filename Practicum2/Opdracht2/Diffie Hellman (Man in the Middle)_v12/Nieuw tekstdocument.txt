@@ -1,0 +1,81 @@
+
+{-p = 2011
+q = 2003
+n = p * q
+phi = (p-1) * (q-1)
+
+e = 1861
+d = invert e phi
+
+-- the encryption and decryption functions for Alice
+encryptA m = expm m e n
+decryptA c = expm c d n
+
+mess = 10203-}
+
+
+main :: IO()
+main = do
+   let a = 10
+   let b = 20
+
+-- printing the output by invoking the gcd5 function
+   putStr("GCD of "++ (show a) ++ " and "++ (show b) ++" is:")
+   print (gcd5 a b)
+  -- putStrLn "n\tphi\tprime\n---------------------"
+{-  let loop !i !count
+        | i >= 10 ^ 6 = return ()
+        | otherwise = do
+          let i_ = succ i
+              tot = totient i_
+              isPrime = tot == pred i_
+              count_
+                | isPrime = succ count
+                | otherwise = count
+          when (25 >= i_) $
+            putStrLn $ show i_ ++ "\t" ++ show tot ++ "\t" ++ show isPrime
+          when
+            (i_ `elem`
+             25 :
+             [ 10 ^ k
+             | k <- [2 .. 6] ]) $
+            putStrLn $ "Number of primes up to " ++ show i_ ++ " = " ++ show count_
+          loop (i + 1) count_
+          loop 0 0-}
+
+
+{-
+genPrime :: CryptoRandomGen g => g -> Int -> Integer -> Integer -> Integer
+genPrime g k minPrime maxPrime = head $ filter (fermatPrimeTest g' k) ns
+  where
+    Right (i,g'') = crandom g
+    g'            = mkStdGen i
+    Right (n,_)   = crandomR (minPrime, maxPrime) g''
+    ns            = iterate ((+) 2) (n .|. 1)
+
+
+genPQ :: CryptoRandomGen g => g -> Int -> Integer -> Integer -> (Integer,Integer)
+genPQ g k minPrime maxPrime = (p,q)
+  where
+    Right (g1,g2) = splitGen g
+    p = genPrime g1 k minPrime maxPrime
+    q = genPrime g2 k minPrime maxPrime
+
+-- genRSAKeys e g k minPrime maxPrime
+-- e is public exponent, g is random seed,
+-- k is number of iterations to run Rabin-Miller test.
+-- minPrime, maxPrime is range to search for primes.
+genRSAKeys :: CryptoRandomGen g => Integer -> g
+           -> Int -> Integer -> Integer
+           -> (PublicKey, PrivateKey)
+genRSAKeys e g k minPrime maxPrime = let
+                                        (p,q) = genPQ g k minPrime maxPrime
+                                        n    = p*q
+                                        t    = lcm (p-1) (q-1)
+                                        d    = modMultInv t e
+                                     in (PublicKey n e, PrivateKey n d)
+
+-}
+
+
+

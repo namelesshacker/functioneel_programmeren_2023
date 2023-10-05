@@ -1,0 +1,69 @@
+
+
+module Lib
+    ( someFunc
+    ) where
+-- import qualified Data.Set as Set
+import Control.Monad (when)
+import Data.Bool (bool)
+-- import System.Random
+-- import Crypto.Random
+-- import Crypto.Random.DRBG
+-- import Control.Monad.CryptoRandom
+import Data.Bits
+-- import qualified Data.ByteString as BS
+import Data.List
+someFunc :: IO ()
+someFunc = putStrLn "someFunc"
+
+
+
+minus :: [Int] -> [Int] -> [Int]
+minus xs@(x:xt) ys@(y:yt) = case compare x y of
+    LT -> x : minus xt ys
+    EQ ->     minus xt yt
+    GT ->     minus xs yt
+minus a         _         = a
+
+{-union :: [Int] -> [Int] -> [Int]
+union xs@(x:xt) ys@(y:yt) = case compare x y of
+    LT -> x : union xt ys
+    EQ -> x : union xt yt
+    GT -> y : union xs yt
+union a         []        = a
+union []        b         = b
+
+uniq :: Ord a => [a] -> [a]
+uniq xs = uniq' Set.empty xs where
+    uniq' _ [] = []
+    uniq' set (y:ys) | Set.member y set = uniq' set ys
+                     | otherwise = y : uniq' (Set.insert y set) xs
+
+
+
+totient :: Int -> Double
+totient 1 = 1.0
+totient n = (fromIntegral n) * product [1.0 - (1.0 / (fromIntegral p)) | p <- uniq $ factorize n]
+
+main :: IO ()
+main = print $ snd $ maximum [((fromIntegral n) / (totient n), n) | n <- [1..1000000]]-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

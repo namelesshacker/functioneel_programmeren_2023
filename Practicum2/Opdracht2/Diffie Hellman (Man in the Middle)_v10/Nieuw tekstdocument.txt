@@ -1,0 +1,70 @@
+
+------------------------------------------------------------------------
+-- A simple RSA implementation in Haskell
+-- For information on the Haskell language, see: http://www.haskell.org
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+-- the list of all primes (slow but short), the sieve of Eratosthenes
+primes = sieve [2 ..]
+    where sieve (x:xs) = x : sieve [ y | y <-xs, y `mod` x > 0]
+
+-----------------------------------------------------------------------
+-- expm a b n = a^b (mod n)
+expm :: Integer -> Integer -> Integer -> Integer
+expm a 0 n = 1
+expm a b n = if even b then (k * k) `mod` n
+                       else (a * k * k) `mod` n
+    where k =  expm a (b `div` 2) n
+-----------------------------------------------------------------------
+-- fermat n = the list of all (a^(n-1) mod n) for each a in {1,...,n-1}
+--   with gcd(a,n) = 1.
+fermat n = [expm a (n-1) n | a <- [1..n-1], mygcd a n == 1]
+
+-- FYI: 561 and 1106 are the two smallest Carmichael numbers.
+-- See: http://en.wikipedia.org/wiki/Carmichael_number
+
+-----------------------------------------------------------------------
+-- xgcd a b = (x,y,d) where d = g.c.d of a and b and d = a*x + b*y
+-- Assumes a,b >= 0
+
+
+
+-- Problem 32: Determine the greatest common divisor of two positive integers.
+-- Enter Euclid:
+mygcd a 0 = abs a
+mygcd a b = mygcd b (a `mod` b)
+
+-- Problem 33: Determine whether two positive integer numbers are coprime.
+-- Straight from the definition of coprimality:
+coprime a b = mygcd a b == 1
+
+-- Problem 34: Calculate Euler's totient function.
+-- The definition makes it easy for us, again:
+phi n = length [m | m <- [1..n-1], coprime m n]
+-----------------------------------------------------------------------
+-- invert a n = a^(-1) (mod n) , if a and n are rel. prime
+--            = 0              , if a and n are not rel. prim
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+-- RSA setup for Alice
+
+p = 2011
+q = 2003
+n = p * q
+my_phi = (p-1) * (q-1)
+
+e = 1861
+d = invert e my_phi
+
+-- the encryption and decryption functions for Alice
+encryptA m = expm m e n
+decryptA c = expm c d n
+
+mess = 10203
+
+
+--  https://web.ecs.syr.edu/~royer/cis675/code/rsa.hs
+

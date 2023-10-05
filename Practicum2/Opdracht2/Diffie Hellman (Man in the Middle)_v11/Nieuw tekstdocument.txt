@@ -1,0 +1,265 @@
+
+
+-- from https://en.wikibooks.org/wiki/Haskell/Classes_and_types#A_concerted_example
+-- Location, in two dimensions.
+
+
+
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float
+data RSAKey = PubKey Float Float Float | PrivKey Float Float Float Float
+
+-- Circle :: Float -> Float -> Float -> Shape
+surface :: Shape -> Float
+surface (Circle _ _ r) = pi * r ^ 2
+surface (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+
+
+encroAnna :: RSAKey -> Float
+encroAnna (PubKey _ _ r) = pi * r ^ 2
+encroAnna (PrivKey x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+
+encroBob :: RSAKey -> Float
+encroBob (PubKey _ _ r) = pi * r ^ 2
+encroBob (PrivKey x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+
+encroMiTM :: Shape -> Float
+encroMiTM (Circle _ _ r) = pi * r ^ 2
+encroMiTM (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+
+
+-- An example type, with accompanying instances.
+data Message = Message
+    { pointName :: String
+    , pointX    :: Int
+    , pointY    :: Int
+    } deriving (Show)
+
+class Session a where
+    getLocation :: a -> (Int, Int)
+
+class Person a where
+    getName :: a -> String
+
+class (Session a) => Movable a where
+    setLocation :: (Int, Int) -> a -> a
+
+data GCDApp = Session | Person deriving (Show, Eq)
+
+class (Person a) => Changeable a where
+    setName :: (String) -> a
+
+instance Session Message where
+    getLocation p = (pointX p, pointY p)
+
+instance Movable Message where
+    setLocation (x, y) p = p { pointX = x, pointY = y }
+
+
+-- Moves a value of a Movable type by the specified displacement.
+-- This works for any movable, including NamedPoint.
+move :: (Movable a) => (Int, Int) -> a -> a
+move (dx, dy) p = setLocation (x + dx, y + dy) p
+    where
+    (x, y) = getLocation p
+
+
+
+
+class MITMProtocol a where
+    message :: a -> Message
+    person :: a -> String
+
+elem = Message "dit is de sleutel" 12 13
+
+
+data Student = Student String String Int Int
+
+
+class IsPerson a where
+  personName :: a -> String
+  bericht :: a -> String
+  privesleutel :: a -> Int
+  publiekesleutel :: a -> Int
+
+instance IsPerson Student where
+  personName (Student name _ _ _) = name
+  bericht (Student _ msg _ _) = msg
+  privesleutel (Student _ _ privKey _) = privKey
+  publiekesleutel (Student _ _ _ pubKey) = pubKey
+
+printName :: (IsPerson a) => a-> IO ()
+printName person = putStrLn $ personName person
+
+printBericht :: (IsPerson a) => a-> IO ()
+printBericht person = putStrLn $ bericht person
+
+{-printPriveSleutel :: (IsPerson a) => a-> IO ()
+printPriveSleutel person = putStrLn $ privesleutel person
+
+printpubKey :: (IsPerson a) => a-> IO ()
+printpubKey person = putStrLn $ publiekesleutel person-}
+
+-- An example type, with accompanying instances.
+data MITM_Message = MITM_Message
+    { msg :: String
+    , eNum    :: Int
+    , k    :: Int
+    } deriving (Show)
+
+class Sessie a where
+    setGroundNumbers :: a -> (Int, Int)
+    setDeelnemerA :: a -> String
+    setDeelnemerB :: a -> String
+    setDeelnemerC :: a -> String
+    getLocan :: a -> (Int, Int)
+    
+   
+class (Sessie a) => Sendable a where
+    sendFromAtoB :: (Int, Int) -> a -> a
+    sendFromBtoA :: (Int, Int) -> a -> a
+    sendFromAtoC :: (Int, Int) -> a -> a
+    sendFromCtoA :: (Int, Int) -> a -> a
+    sendFromBtoC :: (Int, Int) -> a -> a
+    sendFromCtoB :: (Int, Int) -> a -> a
+    setEncryptie :: (Int, Int) -> a -> a
+
+
+class (Sessie a) => Moving a where
+    setter :: (Int, Int) -> a -> a
+ 
+instance Sessie MITM_Message where
+    getLocan p = (eNum p, k p)
+    setGroundNumbers p = (eNum p, k p)
+    
+instance Sendable MITM_Message where
+    setEncryptie (x, y) p = p { eNum = x, k = y }
+    
+instance Moving MITM_Message where
+    setter (x, y) p = p { eNum = x, k = y }
+	
+ 
+
+
+
+
+
+
+
+
+
+
+{-class (Session a) => Movable a where
+    setLocation :: (Int, Int) -> a -> a-}
+
+
+
+{-
+
+class Session a where
+    getGroundNumbers :: a -> (Int, Int)
+
+class (Session a) => Movable a where
+    setEncryption :: (Int, Int) -> a -> a
+
+-- An example type, with accompanying instances.
+data Message = Message
+    { pointName :: String
+    , groundX    :: Int
+    , moduloY    :: Int
+    } deriving (Show)
+
+{-
+instance Session Message where
+    getGroundNumbers p = (groundX p, moduloY p)
+
+instance Movable Message where
+    setEncryption (x, y) p = p { groundX = x, moduloY = y }
+-}
+
+data Deelnemer = Deelnemer String
+  deriving (Eq)
+
+
+data Student = Student String Int
+
+
+
+data Teacher = Teacher
+  { teacherName:: String
+  , teacherAge:: Int
+  , teacherDepartment :: String
+  , teacherSalary :: Int
+  }
+
+
+class IsPerson a where
+  personName :: a -> String
+  personAge :: a -> Int
+
+instance IsPerson Student where
+  personName (Student name _) = name
+  personAge (Student _ age) = age
+
+---
+class Persoon a where
+  persoonsNaam :: a -> String
+  -- encryptiesessie :: a -> Session -> (Int, Int)
+
+
+
+instance Persoon Deelnemer where
+  persoonsNaam (Deelnemer name ) = name
+  -- encryptiesessie (Deelnemer _ sessie) = sessie
+
+
+printNameTeacher :: Teacher -> IO ()
+printNameTeacher teacher = putStrLn $ personName teacher
+
+
+printName :: (IsPerson a) => a-> IO ()
+printName person = putStrLn $ personName person
+
+printNaam :: (Persoon a) => a-> IO ()
+printNaam person = putStrLn $ persoonsNaam person
+
+
+instance Session Message where
+    getGroundNumbers p = (pointX p, pointY p)
+
+instance Movable Message where
+    setEncryption (x, y) p = p { groundX = x, moduloY = y }
+
+
+-- Moves a value of a Movable type by the specified displacement.
+-- This works for any movable, including Message.
+send :: (Movable a) => (Int, Int) -> a -> a
+send (dx, dy) p = setEncryption (x + dx, y + dy) p
+    where
+    (x, y) = getGroundNumbers p
+
+-- Moves a value of a Movable type by the specified displacement.
+-- This works for any movable, including Message.
+move :: (Movable a) => (Int, Int) -> a -> a
+move (dx, dy) p = setEncryption (x + dx, y + dy) p
+    where
+    (x, y) = getGroundNumbers p
+
+
+
+-- Moves a value of a Movable type by the specified displacement.
+-- This works for any movable, including Message.
+receive :: (Movable a) => (Int, Int) -> a -> a
+receive (dx, dy) p = setEncryption (x + dx, y + dy) p
+    where
+    (x, y) = getGroundNumbers p
+
+
+
+
+
+-}
+
+
+--t = Message "mag ik van jou de sleutel" 15 13
+
+-- https://codeahoy.com/learn/appliedfp/ch6/

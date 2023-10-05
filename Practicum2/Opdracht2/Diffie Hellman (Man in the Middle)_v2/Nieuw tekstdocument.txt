@@ -1,0 +1,84 @@
+
+
+
+module MIMA
+    ( someFunc,euclid
+    ) where
+
+someFunc :: IO ()
+someFunc = putStrLn "someFunc"
+
+euclid::Integer->Integer->Integer
+euclid n p
+  | n < 0            = 0
+  | n `mod` 17 == 2  = -15
+  | otherwise        = n + p
+
+--rest = print $ (euclid 2 3)
+
+
+
+
+
+--main :: IO ()
+--main = putStrLn "Test suite not yet implemented"
+
+
+-- https://serokell.io/blog/introduction-to-template-haskell
+
+-- http://wiki.haskell.org/Template_Haskell
+
+-- https://downloads.haskell.org/~ghc/7.0.2/docs/html/users_guide/template-haskell.html
+
+
+-- https://srid.ca/haskell-template
+
+-- https://www.parsonsmatt.org/2021/07/12/template_haskell_performance_tips.html
+
+
+-- https://www.tweag.io/blog/2021-01-07-haskell-dark-arts-part-i/
+
+-- https://github.com/PHPirates/haskell-template-project/blob/master/Setup.hs
+
+
+-- https://www.joachim-breitner.de/blog/772-Template_Haskell_recompilation
+
+ 
+-- https://downloads.haskell.org/~ghc/6.0/docs/html/users_guide/template-haskell.html
+
+
+
+
+{-
+
+opdracht 6
+-}
+
+
+
+{-Rsa encryptie werkt met twee sleutels:
+* de private sleutel: strikt geheim en in jouw persoonlijke bezit.
+* de publieke sleutel: deze mag iedereen hebben.
+Voor het genereren van sleutels zijn twee priemgetallen, p en q nodig. Kies
+twee priemgetallen. Hou deze getallen klein, d.w.z. tussen de 100 en 500. In
+echte toepassingen van rsa encryptie zijn de getallen veel groter en worden veel
+efficientere algoritmen gebruikt. Deze algoritmen maken gebruik van geavanceerdere
+getaltheorie. In deze opdracht houden we het bij de basale werking
+van rsa encryptie.
+De volgende berekeningen moeten worden uitgevoerd:
+* De modulus: m = p * q
+* Eulers totient functie: m0 = phi(m) = (p - 1) * (q - 1)
+Vervolgens kiezen we een getal e dat relatief priem is met m0. Het getal e
+voldoet dus aan de volgende twee voorwaarden:
+* e < m0
+* ggd(e;m0) = 1
+Zodra we een geschikt getal e gekozen hebben, moeten we een bijbehorende d
+berekenen. Voor d geldt:
+- e * d = 1(mod m0)
+We hebben nu de private sleutel, de publieke sleutel en de modulus!
+* De private sleutel is e
+* De publieke sleutel is d
+* De modulus is m-}
+
+
+
