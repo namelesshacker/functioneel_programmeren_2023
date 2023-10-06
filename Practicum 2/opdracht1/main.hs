@@ -1,4 +1,12 @@
+{-
+Opdracht 1
+Schrijf het datatype Boek. Dit datatype bevat drie velden:
+ Prijs: De prijs van het boek.
+ Titel: De titel van het boek.
+ Auteur: De schrijver van het boek.
+Gebruik type synoniemen om de code leesbaar te houden.
 
+-}
 module Main (main) where
 
 import MIMA

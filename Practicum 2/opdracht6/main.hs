@@ -1,4 +1,9 @@
+{-
+Opdracht 6
+Schrijf het datatype Zak. Ook dit datatype is algebrasch. Verder gelden dezelfde
+voorwaarden als bij het Box type: Een zak bevat iets of is Leeg
 
+-}
 module Main (main) where
 
 import MIMA

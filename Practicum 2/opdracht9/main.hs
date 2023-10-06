@@ -1,4 +1,14 @@
+{-
+Opdracht 9
+Schrijf het datatype List. Dit datatype is geparameteriseerd en denieert recursief
+een list.
+ Leidt de List af van de Functor typeclass.
+ Vul de List met dozen met getallen. Gebruik daarvoor de foldr of
+foldl functie.
+ Gebruik de functionaliteit van Functor om een met Box gevulde list te
+vervangen door een met Zak gevulde list.
 
+-}
 module Main (main) where
 
 import MIMA

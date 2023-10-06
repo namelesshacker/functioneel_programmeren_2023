@@ -1,4 +1,10 @@
+{-
+Opdracht 4
+Schrijf het datatype Box a. Dit datatype is algebrasch. Een box:
+ is Leeg.
+ bevat iets, waarvan we van te voren niet weten wat het is.
 
+-}
 module Main (main) where
 
 import MIMA

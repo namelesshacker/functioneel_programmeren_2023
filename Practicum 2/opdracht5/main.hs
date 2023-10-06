@@ -1,4 +1,10 @@
+{-
+Opdracht 5
+Schrijf een functie die alle boeken in een gegeven lijst in een Box inpakt. Schrijf
+ook een functie die het omgekeerde doet en, so to speak, alle boeken weer
+uitpakt.
 
+-}
 module Main (main) where
 
 import MIMA

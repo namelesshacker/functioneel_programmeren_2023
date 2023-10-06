@@ -1,4 +1,9 @@
+{-
+Opdracht 7
+Leidt zowel het datatype Box als het datatype Zak af van de Functor typeclass
+en implementeer de functie fmap voor beide datatypen.
 
+-}
 module Main (main) where
 
 import MIMA

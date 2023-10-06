@@ -1,4 +1,11 @@
-
+{-
+Opdracht 3
+Maak een lijst van tenminste vijf boeken. Test of je implementatie van de EQ
+en Ord typeclasses correct werkt door:
+ enkele boeken met elkaar te vergelijken.
+ de lijst met boeken te sorteren middels het gebruik van de sort functie.
+Deze functie zit in de library Data.List.
+-}
 module Main (main) where
 
 import MIMA
