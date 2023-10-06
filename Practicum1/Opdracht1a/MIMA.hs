@@ -13,6 +13,8 @@ euclid n p
   | n < 0            = 0
   | n `mod` 17 == 2  = -15
   | otherwise        = n + p
+  
+fact n = if n == 0 then 1 else n * fact(n-1)
 
 --rest = print $ (euclid 2 3)
 

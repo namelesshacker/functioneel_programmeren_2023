@@ -1,7 +1,7 @@
 
 module Main (main) where
 
-import MIMA
+import DICE
 
 --rest = print $ (euclid 2 3)
 main :: IO ()

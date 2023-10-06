@@ -1,7 +1,7 @@
 
 
 
-module MIMA
+module ROOT
     ( someFunc,euclid
     ) where
 

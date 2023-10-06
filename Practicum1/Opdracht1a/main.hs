@@ -12,7 +12,8 @@ main = print $ (euclid 36 15)
 --main = print (fact 5)
 
 
- 
+fact n = if n == 0 then 1 else n * fact(n-1)
+main = print (fact 5)
 
 
 --ghc --make -XQuasiQuotes main.hs -o main

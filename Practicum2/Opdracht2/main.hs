@@ -1,7 +1,7 @@
 
 module Main (main) where
 
-import Lib
+import MITM
 
 --rest = print $ (euclid 2 3)
 main :: IO ()

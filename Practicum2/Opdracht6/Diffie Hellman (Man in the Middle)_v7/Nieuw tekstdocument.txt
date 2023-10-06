@@ -1,0 +1,25 @@
+
+-- Voor d geldt:  e * d = 1(mod m')
+
+
+{-
+pubkey :: Integer -> Integer -> Integer
+pubkey e m  = if e*d = 1 mod m  && gcd e m ==1 then e
+-}
+
+
+
+{-pubkey :: Int -> Int -> Int -> Int
+pubkey e m d =  if e*d == 1 mod m  && gcd e m ==1 then e-}
+
+
+{-pubkey2 :: Int -> Int -> Int -> Int
+pubkey2 e m d =  if e*d == (1 mod m)  && (gcd5 e m) ==1-}
+
+{-privkey :: Integer -> Integer -> Integer
+privkey e m  = if e < m && gcd e m ==1 then e-}
+
+
+-- https://gist.github.com/jds375/8247318
+
+

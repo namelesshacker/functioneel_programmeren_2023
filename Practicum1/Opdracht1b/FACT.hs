@@ -1,7 +1,7 @@
 
 
 
-module MIMA
+module FACT
     ( someFunc,euclid
     ) where
 
@@ -13,6 +13,20 @@ euclid n p
   | n < 0            = 0
   | n `mod` 17 == 2  = -15
   | otherwise        = n + p
+  
+  
+module FACT
+    ( someFunc
+    ) where
+
+someFunc :: IO ()
+someFunc = putStrLn "someFunc"
+
+module Main where
+  factorial :: Integer -> Integer
+  factorial x
+    | x > 1 = x * factorial (x - 1)
+    | otherwise = 1
 
 --rest = print $ (euclid 2 3)
 

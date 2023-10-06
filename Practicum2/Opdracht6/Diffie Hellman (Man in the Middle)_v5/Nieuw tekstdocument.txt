@@ -1,0 +1,58 @@
+
+-- opgave 2
+
+-- https://www.geeksforgeeks.org/eulers-totient-function/
+-- https://nl.wikipedia.org/wiki/Indicator_(getaltheorie)
+-- https://cp-algorithms.com/algebra/phi-function.html
+-- https://www.dcode.fr/euler-totient
+-- https://wiki.haskell.org/99_questions/Solutions/34
+-- https://mail.haskell.org/pipermail/haskell-cafe/2011-May/091898.html
+-- https://stackoverflow.com/questions/49591643/rewriting-euler-totient-function-in-haskell
+-- https://codegolf.stackexchange.com/questions/83533/calculate-eulers-totient-function
+-- https://www.macs.hw.ac.uk/~hwloidl/Courses/F21DP/tutorial0.html
+-- https://rosettacode.org/wiki/Totient_function#Haskell
+-- https://www.javaer101.com/en/article/18677294.html
+-- https://github.com/eklitzke/evan-haskell-euler/blob/master/polyomino/ArithmeticFunctions.hs
+-- https://www.debugcn.com/en/article/18677294.html
+-- https://blog-c7ff.kxcdn.com/problem/algorithm/eulers-totient-function/?layout=old
+-- http://blog.vmchale.com/article/ats-totient
+-- makkelijkste voorbeeld
+-- https://mfukar.github.io/2015/07/28/haskell4.html
+-- https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/archv021.cgi?read=223680
+-- https://mathoverflow.net/questions/3274/how-hard-is-it-to-compute-the-euler-totient-function
+-- euler totient solution
+-- https://zach.se/project-euler-solutions/69/
+-- c solution
+-- https://www.codegrepper.com/code-examples/cpp/euler%27s+totient+function+c%2B%2B
+-- euler totient haskell solution
+-- http://www.progsoc.uts.edu.au/wiki/Euler_Solution_69
+
+
+-- De modulus: m = p * q
+
+modulus_m :: Double -> Double  -> Double
+modulus_m p q = p * q
+
+-- Eulers totient functie: m0 = phi(m) = (p - 1) * (q - 1)
+euler_totient :: Double -> Double  -> Double
+euler_totient p q = (p - 1) * (q - 1)
+
+--Vervolgens kiezen we een getal e dat relatief priem is met m0. Het getal e
+--voldoet dus aan de volgende twee voorwaarden:
+-- * e < m'
+-- * ggd(e,m') = 1
+
+
+--
+
+-- function declaration
+gcd5 :: Int->Int->Int
+
+-- function definition
+gcd5 a 0 = a
+gcd5 a b = gcd5 b (mod a b)
+
+
+
+ --https://www.tutorialspoint.com/haskell-program-to-find-the-gcd-of-two-numbers
+

@@ -1,7 +1,7 @@
 
 module Main (main) where
 
-import FACT
+import MIMA
 
 --rest = print $ (euclid 2 3)
 main :: IO ()
@@ -14,7 +14,7 @@ main = print $ (euclid 36 15)
 
  
 
-
+-- ghc --make -XQuasiQuotes LibTester.hs -o LibTester
 --ghc --make -XQuasiQuotes main.hs -o main
 
 

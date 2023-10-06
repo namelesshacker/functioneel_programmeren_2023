@@ -1,0 +1,86 @@
+
+gcde :: Integer→Integer→(Integer,Integer,Integer)
+gcde a b=
+let 
+gcd_f (r1,x1,y1) (r2,x2,y2)
+| r2==0=(r1,x1,y1)
+| otherwise=
+let
+q=r1 ‘div‘ r2
+r=r1 ‘mod‘ r2
+in
+gcd_f (r2,x2,y2) (r,x1−q∗x2,y1−q∗y2)
+(d,x,y)=gcd_f (a,1,0) (b,0,1)
+in
+if   d<0then (−d,−x,−y)
+else (d,x,y)
+
+
+invm :: Integer→Integer→Integer
+invm m a
+| g/=1=error "No inverse exists"
+| otherwise=x ‘mod‘ m
+where (g,x,_)=gcde a m
+
+
+expm :: Integer→Integer→Integer→Integer
+expm m b k=(b∧k) ‘mod‘ m
+
+
+expm :: Integer→Integer→Integer→Integer
+expm m b k
+let
+ex a k s
+| k==0=s
+| k ‘mod‘ 2==0=((ex (a∗a ‘mod‘ m)) (k ‘div‘ 2)) s
+| otherwise=((ex (a∗a ‘mod‘ m)) (k ‘div‘ 2)) (s∗a ‘mod‘ m)
+in ex b k 1
+data RSAPublicKey=PUB  Integer Integer−−(n,e)
+data RSAPrivateKey=PRIV Integer Integer−−(n,d)
+
+
+
+
+
+genRSAKey :: Integer→Integer→(RSAPrivateKey,RSAPublicKey)
+genRSAKey p q=
+ 
+letphi
+n=p∗q
+e=find (phi ‘div‘ 5)
+d=invm phi e
+find x
+| g==1=x
+| otherwise=find ((x+1) ‘mod‘ phi)
+where (g,_,_)=gcde x phi
+in
+
+
+computeRSAKey :: Integer→Integer→Integer→(RSAPrivateKey,RSAPublicKey)
+computeRSAKey p q e=letphi=(p−1)∗(q−1)(g,_,_)=gcde e phin=p∗qd=invm phi einif   (g/=1)then error "Public exponent not acceptable"else (PRIV n d,PUB n e)Figure 7: RSA key generation with a given public exponentersa :: PublicKey→Integer→Integerersa (n,e) x=expm n x edrsa :: PrivateKey→Integer→Integerdrsa (n,d) x=expm n x d
+
+
+
+
+class Split a wheresplit   :: Integer→a→[Integer]combine :: Integer→[Integer]→aFigure 9: The split classe_rsa :: (Split a)⇒RSAPublicKey→a→[Integer]e_rsa k@(PUB n _) x=map (ersa k) (split n x)d_rsa :: (Split a)⇒RSAPrivateKey→[Integer]→ad_rsa k@(PRIV n _) x=combine n (map (drsa k) x)
+
+data RSAPrivateKey=PRIV Integer Integer−−(n,d)| CRT  Integer Integer Integer Integer Integer Integer Integer−−(n,d,p,q,d mod (p−1),d mod (q−1),(inverse q) mod p)
+
+drsa :: RSAPrivateKey→Integer→Integerdrsa (PRIV n d) x=expm n x ddrsa (CRT n d p q exp1 exp2 coeff) x=let(a1,a2)=(expm p x exp1,expm q x exp2)u=((a2−a1)∗coeff) ‘mod‘ qina1+u∗p
+
+
+
+class PRNG g wherenextB       :: g→(Integer,g)nextI       :: Int→g→(Integer,g)nextM       :: Integer→g→(Integer,g)Figure 13: ThePRNGclassdata BBSRand=BBS Integer Integer−−(modulus,x)seedBBSRand :: Integer→Integer→BBSRandseedBBSRand modulus seed=let(g,_,_)=gcde seed modulusinif   g/=1then seedBBSRand modulus (seed+1)else BBS modulus ((seed∗seed) ‘mod‘ modulus)nextBBSBit :: BBSRand→(Integer,BBSRand)nextBBSBit (BBS modulus x)=(x ‘mod‘ 2,BBS modulus ((x∗x) ‘mod‘ modulus))instance PRNG BBSRand wherenextB=nextBBSBit
+
+
+data  PRNG g⇒SecureRandom g a=SecureRandom (g→(a,g))thenRandom :: PRNG g⇒(SecureRandom g a)→(a→(SecureRandom g b))→(SecureRandom g b)thenRandom (SecureRandom r) f=(SecureRandom (\g→let (v,g’)=r g(SecureRandom r’)=f vin r’ g’))instance PRNG g⇒Monad (SecureRandom g) where(>>=)=thenRandomreturn a=(SecureRandom (\g→(a,g)))
+
+
+newtype PRNG g⇒ProbabilityTest g=PTEST (Integer→(SecureRandom g Bool))isFermat :: PRNG g⇒Int→(ProbabilityTest g)type PrimeFilter=Integer→BoolmkPrime :: (PRNG g)⇒(ProbabilityTest g)→PrimeFilter→Int→(SecureRandom g Integer)mkPrime (PTEST pTest) filter s=lettry p=dob←pTest p(if b && (filter p)then return pelse try (p+2))indop←nextOddInteger stry p
+
+
+mkRSAKey :: (PRNG g)⇒Int→SecureRandom g (RSAPrivateKey,RSAPublicKey)mkRSAKey s=dop←mkPrime (isFermat 20) (\p→(p−1) ‘mod‘ 3/=0) (s ‘div‘ 2)q←mkPrime (isFermat 20) (\p→(p−1) ‘mod‘ 3/=0) (s ‘div‘ 2)return (computeRSAKey p q 3)Figure 17: The functionmkRSAKeysign :: RSAPrivateKey→String→Integersign k d=drsa k (sha1 d)verify :: RSAPublicKey→String→Integer→Boolverify k d s=(sha1 d)==(ersa k s)
+
+-- https://docplayer.net/6449300-Implementing-public-key-cryptography-in-haskell.html
+
+

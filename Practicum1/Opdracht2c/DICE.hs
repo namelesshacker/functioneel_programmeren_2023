@@ -1,7 +1,7 @@
 
 
 
-module MIMA
+module DICE
     ( someFunc,euclid
     ) where
 
@@ -48,161 +48,55 @@ euclid n p
 
 
 
+
+--We gooien met drie dobbelstenen. Schrijf een functie die een lijst teruggeeft
+--met alle mogelijke worpen. Voor het representeren van een worp gebruiken we
+--tuples, bijv. (1; 2; 3). Schrijf de functie zodanig dat alleen de worpen, waarvan
+--de som van de ogen een veelvoud is van vijf in de lijst worden opgenomen. Hoe
+--groot is het aantal worpen?
+
+
+
+
+
 module Lib
     ( someFunc
     ) where
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
---
-import Data.Complex (Complex, realPart)
 
-type CD = Complex Double
 
-quadraticRoots :: (CD, CD, CD) -> (CD, CD)
-quadraticRoots (a, b, c)
-  | 0 < realPart b =
-    ( (2 * c) / (- b - d),
-      (- b - d) / (2 * a)
-    )
-  | otherwise =
-    ( (- b + d) / (2 * a),
-      (2 * c) / (- b + d)
-    )
+
+import Control.Monad (replicateM)
+import Data.List (group, sort)
+
+succeeds :: (Int, Int) -> (Int, Int) -> Double
+succeeds p1 p2 =
+  sum
+    [ realToFrac (c1 * c2) / totalOutcomes
+    | (s1, c1) <- countSums p1
+    , (s2, c2) <- countSums p2
+    , s1 > s2 ]
   where
-    d = sqrt $ b ^ 2 - 4 * a * c
+    totalOutcomes = realToFrac $ uncurry (^) p1 * uncurry (^) p2
+    countSums (nFaces, nDice) = f [1 .. nFaces]
+      where
+        f =
+          fmap (((,) . head) <*> (pred . length)) .
+          group . sort . fmap sum . replicateM nDice
 
 main :: IO ()
-main =
-  mapM_
-    (print . quadraticRoots)
-    [ (3, 4, 4 / 3),
-      (3, 2, -1),
-      (3, 2, 1),
-      (1, -10e5, 1),
-      (1, -10e9, 1)
-    ]
-
--- https://rosettacode.org/wiki/Roots_of_a_quadratic_function#Haskell
-
--- ax^2 + bx + c = 0
-
-qEquation :: (Float, Float, Float) -> (Float, Float)
-qEquation (a, b, c) = (x1, x2)
-		where
-			x1 = e + sqrt d / (2 * a)
-			x2 = e - sqrt d / (2 * a)
-			d = b * b - 4 * a * c
-			e = - b / (2 * a)
-
-
-
-
-
--- https://gist.github.com/rbtbr/243360
-
-
-
-
-
--- function declaration for function printRoots
-printRoots :: Float->Float->Float->IO()
-
--- function definition for function printRoots
-printRoots a b c = do
-   print("a,b,c values =",a,b,c)
-   let d = b^2 - 4*a*c
-   -- let d = 1
-   if (d < 0)
-      then do
-         print ("This quadratic equation has imaginary roots")
-      else do
-         let root1 = (-(b) + sqrt (d))/2 * (a)
-         let root2 = (-(b) - sqrt (d))/2 * (a)
-         print ("The roots for this quadratic are:")
-         print (root1)
-         print (root2)
-
-main :: IO()
 main = do
--- declaring and initializing constants in quadratic equation
-   let a = 1
-   let b = 4
-   let c = 2
--- invoking the printRoots function
-   printRoots (a) (b) (c)
-
--- https://www.tutorialspoint.com/haskell-program-to-find-all-roots-of-a-quadratic-equation
+  print $ (4, 9) `succeeds` (6, 6)
+  print $ (10, 5) `succeeds` (7, 6)
 
 
 
-functionRoot a b c = if d < 0 then error "0" else (x, y)
-                        where
-                          x = e + sqrt d / (2 * a)
-                          y = e - sqrt d / (2 * a)
-                          d = b * b - 4 * a * c
-                          e = - b / (2 * a)
-
--- https://stackoverflow.com/questions/7794692/haskell-quadratic-equation-root
+-- https://rosettacode.org/wiki/Dice_game_probabilities
 
 
 
--- MathPrimer
-
-delta :: Floating a => a -> a -> a -> a
-x1 :: Floating a => a -> a -> a -> a
-x2 :: Floating a => a -> a -> a -> a
-
-delta a b c = b * b - 4 * a * c
-
-x1 a b c = ( - b - sqrt(delta a b c)) / ( 4 * a * c )
-x2 a b c = ( - b + sqrt(delta a b c)) / ( 4 * a * c )
-
-
-class Algebraic equ where
-    algebraicForm :: equ -> String
-
-class (ZeroEquation equ) where
-    solve :: equ -> [Float]
-    solutionCount :: equ -> Int
-
-
-data Equation = Quadratic {a :: Float, b :: Float, c :: Float}
-    deriving (Show, Read, Eq)
-
-instance (ZeroEquation Equation) where
-    solve (Quadratic a b c) = solutions
-        where
-            both = [x1 a b c, x2 a b c]
-            one = [x1 a b c]
-            zero = []
-            solutions = if _delta < 0 then zero else if _delta == 0 then one else both
-            _delta = (delta a b c)
-    solutionCount (Quadratic a b c) = count
-        where
-            count = if _delta < 0 then 0 else if _delta == 0 then 1 else 2
-            _delta = (delta a b c)
-
-instance (Algebraic Equation) where
-    algebraicForm (Quadratic a b c) = show a ++ "x^2 +" ++ show b ++ "x +" ++ show c
-
-showEquation :: Equation -> String
-showEquation equ = "Equation " ++ description ++ " = 0 has following " ++ count ++ " solutions:\n" ++ solutions
-    where
-        count = show $ solutionCount equ
-        description = algebraicForm equ
-        solutions = unlines $ map show $ solve equ
-
-main = do
-    let equation = Quadratic (-10) 4 1
-    putStrLn $ showEquation equation
-
-
--- https://codereview.stackexchange.com/questions/254618/haskell-basic-typeclass-primer-quadratic-equations
-
-
-
-{-
 Opdracht 2d
 Schrijf de functie:
 integreer::(Double->Double)->Double->Double->Double->Double
@@ -1580,4 +1474,3 @@ main = do
     outcome
     count 6
 
--}
