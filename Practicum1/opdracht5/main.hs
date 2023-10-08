@@ -46,19 +46,50 @@ van het geometrisch guur voor als percentage van de totale oppervlakte van
 alle guren. Alle getallen bij elkaar opgeteld leveren derhalve de waarde 100 op.
 
 -}
-module Main (main) where
+--module Main (main) where
 
-import MIMA
+--import MIMA
 
 --rest = print $ (euclid 2 3)
-main :: IO ()
-main = print $ (euclid 36 15)
+--main :: IO ()
+--main = print $ (euclid 36 15)
 
 --C:\Users\gally\Documents\FuncProg\Practicum2\Opdracht1a
 --fact n = if n == 0 then 1 else n * fact(n-1)
 --main = print (fact 5)
 
+data Point = Point Float Float deriving (Show)
+data Shape = Circle Point Float | 
+         Rectangle Point Point | 
+         Triangle Point Point Point  deriving (Show) 
+         
+database :: [Shape]
+database = [(Circle (Point 2 5) 5), (Circle (Point 1 4) 3), (Circle (Point 8 3) 4),
+    (Rectangle (Point 0 5) (Point 10 0)), (Rectangle (Point 3 5) (Point 10 0)),(Rectangle (Point 0 10) (Point 20 0)),
+    (Triangle (Point 1 1) (Point 2 2) (Point 3 1)), (Triangle (Point 2 5) (Point 5 8) (Point 9 1))]
+    
+    
+isCircle :: Shape  -> Bool
+isCircle (Circle _ _) = True
+isCircle _ = False
 
+databaseCircles = filter isCircle database
+
+isRectangle :: Shape  -> Bool
+isRectangle (Rectangle _ _) = True
+isRectangle _ = False
+
+databaseisRectangles = filter isRectangle database
+
+
+
+isTriangle :: Shape  -> Bool
+isTriangle (Triangle _ _ _) = True
+isTriangle _ = False
+
+databaseTriangles = filter isTriangle database
+
+main = print $ databaseCircles
  
 
 

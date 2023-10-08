@@ -46,13 +46,13 @@ van het geometrisch guur voor als percentage van de totale oppervlakte van
 alle guren. Alle getallen bij elkaar opgeteld leveren derhalve de waarde 100 op.
 
 -}
-module Main (main) where
+--module Main (main) where
 
-import MIMA
+--import MIMA
 
 --rest = print $ (euclid 2 3)
-main :: IO ()
-main = print $ (euclid 36 15)
+--main :: IO ()
+--main = print $ (euclid 36 15)
 
 --C:\Users\gally\Documents\FuncProg\Practicum2\Opdracht1a
 --fact n = if n == 0 then 1 else n * fact(n-1)
@@ -64,4 +64,26 @@ main = print $ (euclid 36 15)
 
 --ghc --make -XQuasiQuotes main.hs -o main
 
+
+data Point = Point Float Float deriving (Show)
+data Shape = Circle Point Float | 
+            Vierkant Point Float | 
+         Rectangle Point Point | 
+         Triangle Point Point Point  deriving (Show) 
+ 
+database :: [Shape]
+database = [(Circle (Point 2 5) 5), (Circle (Point 1 4) 3), (Circle (Point 8 3) 4),
+    (Rectangle (Point 0 5) (Point 10 0)), (Rectangle (Point 3 5) (Point 10 0)),(Rectangle (Point 0 10) (Point 20 0)),
+    (Triangle (Point 1 1) (Point 2 2) (Point 3 1)), (Triangle (Point 2 5) (Point 5 8) (Point 9 1))]
+    
+myScore x list_items
+    | x == "Vierkant" = [ s | s@(Vierkant _ _) <- list_items ]
+    | x == "Circle" = [ s | s@(Circle _ _) <- list_items ]
+    | x == "Triangle" = [ s | s@(Triangle _ _ _) <- list_items ]
+    | x == "Rectangle" = [ s | s@(Rectangle _ _) <- list_items ]
+    | otherwise = [ s | s@(Circle _ _) <- list_items ]
+    
+y = (myScore "hello" database)
+rest = print $ (y)
+main = print $ (y)
 
