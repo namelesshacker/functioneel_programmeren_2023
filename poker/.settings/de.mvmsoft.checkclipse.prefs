@@ -1,0 +1,4 @@
+#Sat Apr 28 09:21:13 EDT 2007
+enabled=true
+file_filter=in\:\\.java$\nin\:\\.properties$\nex\:src/util/CombinationGenerator.java\nex\:src/util/test/*\n
+filenames.config=default_checks.xml
